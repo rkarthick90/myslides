@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+
+    <title> Webpack - Module Bundler </title>
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <link rel="stylesheet" href="css/reveal.css">
+    <link rel="stylesheet" href="css/theme/black.css" id="theme">
+
+    <!-- Theme used for syntax highlighting of code -->
+    <link rel="stylesheet" href="lib/css/zenburn.css">
+
+    <!-- Printing and PDF exports -->
+    <script>
+        var link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.type = 'text/css';
+        link.href = window.location.search.match(/print-pdf/gi) ? 'css/print/pdf.css' : 'css/print/paper.css';
+        document.getElementsByTagName('head')[0].appendChild(link);
+    </script>
+
+    <!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+</head>
+
+<body>
+
+    <div class="reveal">
+
+        <!-- Any section element inside of this container is displayed as a slide -->
+        <div class="slides">
+            <section>
+                <h1> Webpack </h1>
+                <h3>Modue Bundler</h3>
+            </section>
+            <section>
+                <h2>Outline</h2>
+                <ul>
+                    <li> What is Webpack and Why</li>
+                    <li> Node, Package Managers, Module Loaders, Module Bundlers and Task Runners </li>
+                    <li> Webpack Loader (explained)
+                        <ul>
+                            <li>Loader Stages</li>
+                            <li>Chaining Loaders</li>
+                            <li>Using Loaders</li>
+                            <li>Passing additional Information</li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+            <section>
+                <section>
+                    <h2> What is Webpack </h2>
+                    <p>webpack takes modules with dependencies and generates static assets representing those modules.</p>
+                </section>
+                <section>
+                    <h2>Why Webpack</h2>
+                    <ul>
+                        <li>With webpack you can easily split your application into multiple files.</li>
+                        <li>It can build and bundle CSS, preprocessed CSS, compile-to-JS languages (like CoffeeScript), images and more by utilising webpack loaders. </li>
+                        <li>Webpack plugins have the ability to inject themselves into the build process to do all sorts of crazy stuff.</li>
+                    </ul>
+                </section>
+            </section>
+
+
+            <section>
+                <section>
+                    <h2>What is Node</h2>
+                    <p>Node.js is a lean, fast, cross-platform JavaScript runtime environment that is useful for both servers and desktop applications.</p>
+                </section>
+                <section>
+                    <h2>Package Managers</h2>
+                    <p>Package managers simplify installing and updating project dependencies, which are libraries such as: jQuery, Bootstrap, etc - everything that is used on your site and isn't written by you.</p>
+                    <ul>
+                        <li>NPM</li>
+                        <li>Bower</li>
+                    </ul>
+                </section>
+                <section>
+                    <h2> Module Loader/Bundling </h2>
+                    <p>That's it, time to go back up.</p>
+                    <ul>
+                        <li>RequireJS</li>
+                        <li>Browserify</li>
+                        <li>Webpack</li>
+                        <li>SystemJS</li>
+                    </ul>
+                </section>
+                <section>
+                    <h2> Task runner </h2>
+                    <p>Task runners and build tools are primarily command-line tools. Why we need to use them: In one word: automation. The less work you have to do when performing repetitive tasks like minification, compilation, unit testing, linting which
+                        previously cost us a lot of times to do with command line or even manually.</p>
+                    <ul>
+                        <li>Grunt</li>
+                        <li>Gulp</li>
+                    </ul>
+                </section>
+            </section>
+
+            <section>
+                <h2>Loaders</h2>
+                <p>Loaders are what makes Webpack's bundling so powerful. They transform all different types of code into JavaScript that can be imported into your application. Doing this can allow you to bundle all of your resources together. </p>
+            </section>
+
+            <section>
+                <h2>What are Loaders</h2>
+                <p> loaders are functions that take a source argument, transform it in some way, and returns the result.</p>
+                <br/>
+                <pre>
+					<code class="hljs" data-trim contenteditable>
+						function reverseStringLoader(source) {
+							const reversed = source.split('').reverse().join('');
+							return `module.exports = "${reversed}";`;
+							}
+					</code>
+				</pre>
+            </section>
+            <section>
+                <section id="fragments">
+                    <h2>Loader Stages</h2>
+                    <p>Webpack has three stages for running loaders:</p>
+                    <p class="fragment">pre-loaders</p>
+                    <p class="fragment">loaders </p>
+                    <p class="fragment">post-loaders </p>
+                </section>
+                <section>
+                    <h3>pre-loaders</h3>
+                    <p>The pre-loaders are useful for anything that should be done before the file is transformed into JavaScript. In the Webpack documentation, they give an example of this as compressing an image. Any code linting should also be done in
+                        a pre-loader.</p>
+                </section>
+                <section>
+                    <h3>Loaders</h3>
+                    <p>This is where the brunt of the work is done. The transformation of code to a JavaScript module should be done in the loader stage.</p>
+                </section>
+                <section>
+                    <h3>post-loaders</h3>
+                    <p>Once a file has been transformed to JavaScript, you may want to do additional processing on the code, such as testing code coverage. This should be done in the post-loader stage.</p>
+                </section>
+            </section>
+            <section>
+                <h3>Chaining Loaders</h3>
+                <p>Instead of one complex loader that does many steps, Webpack prefers to break loaders into many simple steps.</p>
+                <p>chain loaders to be used, either as an array or an exclamation point (!) separated string. When this is done, the loaders are executed from right to left.</p>
+                <pre>
+					<code class="hljs" data-trim contenteditable>
+							// first css-loader will be applied to the source
+							// then the style-loader will be applied to the
+							// result returned by the css-loader.
+							loaders = ['style-loader', 'css-loader']
+					</code>
+				</pre>
+            </section>
+            <section>
+                <section>
+                    <h2>Loader Config Properties</h2>
+                    <p>There's different types of fragments, like:</p>
+                    <p class="fragment fade-up">test</p>
+                    <p class="fragment fade-up">exclude</p>
+                    <p class="fragment fade-up">include</p>
+                    <p class="fragment fade-up">loader </p>
+                    <p class="fragment fade-up">loaders</p>
+                </section>
+                <section>
+                    <pre>
+						<code class="hljs" data-trim contenteditable>
+								module.exports = {
+									module: {
+										loaders: [
+										{
+											test: /\.css$/,
+											include: '/css/',
+											loaders: ['style', 'css']
+										},
+										{
+											test: /\.jsx$/,
+											exclude: '/node_modules/',
+											loader: 'babel'
+										}
+										]
+									}
+									};
+						</code>
+					</pre>
+                </section>
+                <section>
+                    <h3>test</h3>
+                    <p> The test value is used to check whether a particular file should be transformed using a loader. This can be a string, an array, a function, or a regular expression. Most often, this is a regular expression that tests the extension
+                        of the file. For instance, .css files would use the css-loader and style-loader while a .jsx file would most likely use babel-loader.</p>
+                </section>
+                <section>
+                    <h3>exclude </h3>
+                    <p> exclude is similar to test, except when a file is matched by the exclude value, that file won't be transformed by the loader. A common use case for this is to exclude files in your /node_modules/ directory.</p>
+                </section>
+                <section>
+                    <h3>include </h3>
+                    <p>include is the opposite of exclude. Instead of specifying to exclude the /node_modules/ directory, you could instead tell Webpack to only include files in your source (as specified by context) directory.</p>
+                </section>
+                <section>
+                    <h3>loader </h3>
+                    <p>loader is used to specify loaders as a string, the same way they are in the require call (minus the module name/path).</p>
+                </section>
+                <section>
+                    <h3>loaders </h3>
+                    <p>when chaining loaders, you may prefer to list them in an array instead of an exclamation point separating string. When doing this, remember that they are executed right to left.</p>
+                </section>
+            </section>
+            <section>
+                <section>
+                    <h3>Passing Additional Information</h3>
+                    <p>Loaders are often configurable, giving you more control over how they transform your source code. Webpack accesses this information using the query option string. Similar to a URL, this is specified using a query string. </p>
+                </section>
+                <!-- <p>This can be added directly to the loader string if you are doing this within a require statement. If you are using a Webpack config, query can either be described using a string or an object.</p> -->
+                <section data-transition="slide" data-background="#b5533c">
+                    <p>For example, to pass the params a = 2 and foo = bar, the query would be ?a=2&foo=bar. </p>
+                    <pre><code class="hljs" data-trim contenteditable>
+							// include the params in the loader string
+							var mod = require('some-loader?foo=bar!./myModule');
+							
+							// include the params in the loader string
+							module.exports = {
+							  module: {
+								loaders: [
+								  {
+									test: /\.baz$/,
+									loader: 'baz-loader?a=2&foo=bar'
+								  }
+								]
+							  }
+							};
+					</code>
+					</pre>
+                </section>
+                <section data-transition="slide" data-background="#b5533c">
+                    <p>or as a string value using the query key</p>
+                    <pre><code class="hljs" data-trim contenteditable>
+							// or as a string value using the query key
+							module.exports = {
+							  module: {
+								loaders: [
+								  {
+									test: /\.baz$/,
+									loader: 'baz-loader',
+									query: '?a=2&foo=bar'
+								  }
+								]
+							  }
+							};
+					</code>
+					</pre>
+                </section>
+                <section data-transition="slide" data-background="#b5533c">
+                    <p>you can also use an object</p>
+                    <pre><code class="hljs" data-trim contenteditable>
+							// you can also use an object
+							module.exports = {
+								module: {
+									loaders: [
+										{
+											test: /\.baz$/,
+											loader: 'baz-loader',
+											query: {
+												a: 2,
+												foo: 'bar'
+											}
+										}
+									]
+								}
+							};
+					</code></pre>
+                </section>
+            </section>
+            <section>
+                <h3> Which Loader to Use? </h3>
+                <p>Webpack provides a list of a number of useful loaders. If you discover that there are no loaders that do what you want, you can even write your own.</p>
+                <a href="https://webpack.js.org/loaders/">webpack loaders</a>.
+            </section>
+            <section id="themes">
+                <h2>Themes</h2>
+                <p>
+                    reveal.js comes with a few themes built in: <br>
+                    <!-- Hacks to swap themes after the page has loaded. Not flexible and only intended for the reveal.js demo deck. -->
+                    <a href="#" onclick="document.getElementById('theme').setAttribute('href','css/theme/black.css'); return false;">Black (default)</a> -
+                    <a href="#" onclick="document.getElementById('theme').setAttribute('href','css/theme/white.css'); return false;">White</a> -
+                    <a href="#" onclick="document.getElementById('theme').setAttribute('href','css/theme/league.css'); return false;">League</a> -
+                    <a href="#" onclick="document.getElementById('theme').setAttribute('href','css/theme/sky.css'); return false;">Sky</a> -
+                    <a href="#" onclick="document.getElementById('theme').setAttribute('href','css/theme/beige.css'); return false;">Beige</a> -
+                    <a href="#" onclick="document.getElementById('theme').setAttribute('href','css/theme/simple.css'); return false;">Simple</a> <br>
+                    <a href="#" onclick="document.getElementById('theme').setAttribute('href','css/theme/serif.css'); return false;">Serif</a> -
+                    <a href="#" onclick="document.getElementById('theme').setAttribute('href','css/theme/blood.css'); return false;">Blood</a> -
+                    <a href="#" onclick="document.getElementById('theme').setAttribute('href','css/theme/night.css'); return false;">Night</a> -
+                    <a href="#" onclick="document.getElementById('theme').setAttribute('href','css/theme/moon.css'); return false;">Moon</a> -
+                    <a href="#" onclick="document.getElementById('theme').setAttribute('href','css/theme/solarized.css'); return false;">Solarized</a>
+                </p>
+            </section>
+
+            <section style="text-align: left;">
+                <h1>THE END</h1>
+            </section>
+
+        </div>
+
+    </div>
+
+    <script src="lib/js/head.min.js"></script>
+    <script src="js/reveal.js"></script>
+
+    <script>
+        Reveal.initialize({
+            controls: true,
+            progress: true,
+            history: true,
+            center: true,
+
+            transition: 'slide', // none/fade/slide/convex/concave/zoom
+
+            dependencies: [{
+                src: 'lib/js/classList.js',
+                condition: function() {
+                    return !document.body.classList;
+                }
+            }, {
+                src: 'plugin/markdown/marked.js',
+                condition: function() {
+                    return !!document.querySelector('[data-markdown]');
+                }
+            }, {
+                src: 'plugin/markdown/markdown.js',
+                condition: function() {
+                    return !!document.querySelector('[data-markdown]');
+                }
+            }, {
+                src: 'plugin/highlight/highlight.js',
+                async: true,
+                callback: function() {
+                    hljs.initHighlightingOnLoad();
+                }
+            }, {
+                src: 'plugin/zoom-js/zoom.js',
+                async: true
+            }, {
+                src: 'plugin/notes/notes.js',
+                async: true
+            }]
+        });
+    </script>
+
+</body>
+
+</html>
